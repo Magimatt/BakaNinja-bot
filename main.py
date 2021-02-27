@@ -36,7 +36,7 @@ def GenFursona(seed):
 
 
 # Prefix + description
-bot = commands.Bot(command_prefix="~", description='A bot to do stupid and cringy weeb things.\nWritten by Dingo87.')
+bot = commands.Bot(command_prefix="~", description='A bot to do stupid and cringy weeb things.\nWritten by Magimatt.')
 
 # Bot Commands
 @bot.event
