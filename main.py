@@ -12,7 +12,7 @@ from datetime import datetime#, date, timedelta
 ##################
 TOKEN = os.getenv('TOKEN')
 PREFIX = "~"
-bot = commands.Bot(command_prefix=PREFIX, description='A bot to do stupid and cringy weeb things.')
+bot = commands.Bot(command_prefix=PREFIX, description='A bot to do stupid and cringy weeb things.\nWritten by Magimatt.')
 waifu = waifu(PREFIX)
 
 
@@ -60,6 +60,7 @@ async def bot_is_typing(ctx):
 ################
 # Bot Commands #
 ################
+
 @bot.event
 async def on_ready():
     print(f'Python version: {sys.version}')
