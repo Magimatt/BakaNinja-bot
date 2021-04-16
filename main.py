@@ -1,31 +1,24 @@
-import discord
 import os
 import sys
+import discord
 from discord.ext import commands
 import random
+from waifu import waifu
+import asyncio
+from datetime import datetime#, date, timedelta
 
-# client = discord.Client()
+##################
+# Bot properties #
+##################
+TOKEN = os.getenv('TOKEN')
+PREFIX = "~"
+bot = commands.Bot(command_prefix=PREFIX, description='A bot to do stupid and cringy weeb things.\nWritten by Magimatt.')
+waifu = waifu(PREFIX)
 
-# @client.event
-# async def on_ready():
-#     print('We have logged in as {0.user}'.format(client))
 
-# @client.event
-# async def on_message(message):
-#     if message.author == client.user:
-#         return
-#     if message.content.startswith('~hello'):
-#         await message.channel.send('Konnichiwa! I\'m BakaNinja Bot!')
-
-# Bot logic
-def GenWaifu(seed):
-    random.seed(seed)
-    slider = random.randint(3, 20) * 0.1
-    slider = format(slider, '.1f')
-    waifu = str(random.randint(0, 99999)).zfill(5)
-    response = " cute and totally not super cursed waifu! \nhttps://thisanimedoesnotexist.ai/results/psi-" + str(slider) + "/seed" + str(waifu) + ".png"
-    return response
-
+#############
+# Bot logic #
+#############
 def GenFursona(seed):
     salt = "391110"
     print(seed + salt)
@@ -34,51 +27,94 @@ def GenFursona(seed):
     response = "sexy and totally not super monsterous eldritch nightmare beast fursona! \nhttps://thisfursonadoesnotexist.com/v2/jpgs-2x/seed" + str(fursona) + ".jpg"
     return response
 
+async def daily_waifu_loop():    
+    while True:
+        # fail open check
+        # check date and set if not today (plus activate daily waifu)
+        if not waifu.get_DWSTATE() or waifu.get_CHANNELID is None or datetime.now(waifu.get_TZARIZONA()).strftime("%m/%d/%Y") == waifu.get_TODAY():
+            await asyncio.sleep(10)
+            return
 
-# Prefix + description
-bot = commands.Bot(command_prefix="~", description='A bot to do stupid and cringy weeb things.\nWritten by Magimatt.')
+        # do the things
+        await bot.wait_until_ready()
+        waifudatename = datetime.now(waifu.get_TZARIZONA()).strftime("%m/%d/%Y")
+        print(f"waifudatename is {waifudatename}")
+        ID = waifu.get_CHANNELID()
+        print(f"{ID}, is type {type(ID)}")
+        channel = bot.get_channel(ID)
+        print(f"Channel {channel} gotten!")
 
-# Bot Commands
+        async with channel.typing(): # this does ctx.trigger_typing() without the ctx parameter
+            await asyncio.sleep(3)
+            await channel.send(waifu.send_waifu("No author", waifudatename))
+        print(f"Daily waifu {waifudatename} sent.")
+
+        waifu.set_TODAY(waifudatename)
+        print(f"Today has been set to {waifu.get_TODAY()}.")
+
+async def bot_is_typing(ctx):
+    await ctx.trigger_typing()
+    await asyncio.sleep(3)
+
+
+################
+# Bot Commands #
+################
+
 @bot.event
 async def on_ready():
-    print('Python version', sys.version)
-    print('Discord API version: ' + discord.__version__)
-    print('Logged in as', bot.user.name)
+    print(f'Python version: {sys.version}')
+    print(f'Discord API version: {discord.__version__}')
+    print(f'Logged in as {bot.user.name}')
     print('Bot is ready!')
 
+# bot test command
 @bot.command()
 async def hello(ctx):
-    await ctx.send('Konnichiwa! I\'m BakaNinja Bot!')
+    await bot_is_typing(ctx)
+    await ctx.send("Konnichiwa! I'm BakaNinja Bot!")
 
-# ~waifu command that takes arguments
+# ~waifu command
 @bot.command()
 async def waifu(ctx, *, arg=None):
-    _name = ctx.author.mention
-    if arg is None:
-        response = GenWaifu(_name)
-        response = _name + ", I found your " + response
-    else:
-        response = GenWaifu(arg.strip())
-        response = "This is " + arg + ", a" + response
-    await ctx.send(response)
+    await bot_is_typing(ctx)
+    author = ctx.author.mention
+    await ctx.send(waifu.send_waifu(author, arg))
 
 # ~fursona command
 @bot.command()
 async def fursona(ctx, *, arg=None):
-    _name = ctx.author.mention
+    await bot_is_typing(ctx)
+    author = ctx.author.mention
     if arg is None:
-        response = GenFursona(_name)
-        response = _name + ", I found your " + response
+        response = GenFursona(author)
+        response = f"{author}, I found your {response}"
     else:
         response = GenFursona(arg.strip())
-        response = "This is " + arg + ", a " + response
+        response = f"This is {arg}, a {response}"
     await ctx.send(response)
 
-print("Starting bot...")
-bot.run(os.getenv('TOKEN'))
+# ~dailywaifu command, starts a daily waifu message sent in the channel it originated from
+@bot.command()
+async def dailywaifu(ctx, arg):
+    await bot_is_typing(ctx)
+    response = waifu.arg_resolve(ctx, arg)
+    await ctx.send(response)
+
+#################
+# START THE BOT #
+#################
+def initialize_bot():
+    bot.loop.create_task(daily_waifu_loop()) # adds the infinite asychio loop to the bot.run()
+    print("Starting bot...")
+    bot.run(TOKEN)
+
+if __name__ == "__main__":
+    initialize_bot()
 
 
-#####\/\/\/\/\/\/\/\/\/\/ TESTING BELOW \/\/\/\/\/\/\/\/\/\/#####
+
+#####\/\/\/\/ OLD STUFF & TESTING BELOW \/\/\/\/#####
 
 # import os
 # import sys
@@ -139,6 +175,20 @@ bot.run(os.getenv('TOKEN'))
 # # Prefix + description
 # bot = commands.Bot(command_prefix="!", description="A bot to do stupid and cringy otaku things.")
 
+###############################
+
+# client = discord.Client()
+ 
+# @client.event
+# async def on_ready():
+#     print('We have logged in as {0.user}'.format(client))
+
+# @client.event
+# async def on_message(message):
+#     if message.author == client.user:
+#         return
+#     if message.content.startswith('~hello'):
+#         await message.channel.send('Konnichiwa! I\'m BakaNinja Bot!')
 
 # ############
 # # COMMANDS #
