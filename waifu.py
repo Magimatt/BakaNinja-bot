@@ -109,7 +109,7 @@ class waifu:
         waifu = str(random.randint(0, 99999)).zfill(5)
         return f"https://thisanimedoesnotexist.ai/results/psi-{slider}/seed{waifu}.png"
 
-    def send_waifu(self, author, arg=None):
+    def get_waifu_response(self, author, arg=None):
         seed = arg.strip() if arg is not None else ctx.author.mention
         url = self.__GenWaifu(seed)
         response_set = responses.waifu_seeded if arg is not None else responses.waifu_base
