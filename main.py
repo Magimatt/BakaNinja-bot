@@ -1,5 +1,6 @@
 import os
 import sys
+from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 import random
@@ -7,10 +8,12 @@ from waifu import waifu
 import asyncio
 from datetime import datetime#, date, timedelta
 
-##################
-# Bot properties #
-##################
+#########################
+# Global bot properties #
+#########################
+load_dotenv()
 TOKEN = os.getenv('TOKEN')
+# TOKEN = os.environ['TOKEN']
 PREFIX = "~"
 bot = commands.Bot(command_prefix=PREFIX, description='A bot to do stupid and cringy weeb things.\nWritten by Magimatt.')
 waifu = waifu(PREFIX)
