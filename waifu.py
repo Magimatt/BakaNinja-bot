@@ -2,7 +2,6 @@ from datetime import time
 import pytz
 from replit import db
 import random
-import responses
 
 
 class waifu:
@@ -107,16 +106,17 @@ class waifu:
         slider = random.randint(3, 20) * 0.1
         slider = format(slider, '.1f')
         waifu = str(random.randint(0, 99999)).zfill(5)
-        return f"https://thisanimedoesnotexist.ai/results/psi-{slider}/seed{waifu}.png"
+        response = "cute and totally not super cursed waifu! \nhttps://thisanimedoesnotexist.ai/results/psi-" + str(slider) + "/seed" + str(waifu) + ".png"
+        return response
 
-    def get_waifu_response(self, author, arg=None):
-        seed = arg.strip() if arg is not None else ctx.author.mention
-        url = self.__GenWaifu(seed)
-        response_set = responses.waifu_seeded if arg is not None else responses.waifu_base
-        
-        response = random.choice(response_set)
-        response = response.format(name=seed, url=url)
-
+    def send_waifu(self, author, arg=None):
+        author
+        if arg is None:
+            response = self.__GenWaifu(author)
+            response = f"{author}, I found your {response}"
+        else:
+            response = self.__GenWaifu(arg.strip())
+            response = f"This is {arg}, a {response}"
         return response
             
     #######################

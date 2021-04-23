@@ -4,7 +4,6 @@ import discord
 from discord.ext import commands
 import random
 from waifu import waifu
-import responses
 import asyncio
 from datetime import datetime#, date, timedelta
 
@@ -25,7 +24,8 @@ def GenFursona(seed):
     print(seed + salt)
     random.seed(seed + salt)
     fursona = str(random.randint(0, 99999)).zfill(5)
-    return f"https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed{fursona}.jpg"
+    response = "sexy and totally not super monsterous eldritch nightmare beast fursona! \nhttps://thisfursonadoesnotexist.com/v2/jpgs-2x/seed" + str(fursona) + ".jpg"
+    return response
 
 async def daily_waifu_loop():    
     while True:
@@ -85,14 +85,13 @@ async def waifu(ctx, *, arg=None):
 @bot.command()
 async def fursona(ctx, *, arg=None):
     await bot_is_typing(ctx)
-    
-    seed = arg.strip() if arg is not None else ctx.author.mention
-    url = GenFursona(seed)
-    response_set = responses.fursona_seeded if arg is not None else responses.fursona_base
-
-    response = random.choice(response_set)
-    response = response.format(name=seed, url=url)
-
+    author = ctx.author.mention
+    if arg is None:
+        response = GenFursona(author)
+        response = f"{author}, I found your {response}"
+    else:
+        response = GenFursona(arg.strip())
+        response = f"This is {arg}, a {response}"
     await ctx.send(response)
 
 # ~dailywaifu command, starts a daily waifu message sent in the channel it originated from
