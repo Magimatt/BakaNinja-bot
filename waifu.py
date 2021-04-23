@@ -4,7 +4,7 @@ from replit import db
 import random
 
 
-class waifu:
+class Waifu:
     ###############
     # CONSTRUCTOR #
     ###############
@@ -76,7 +76,9 @@ class waifu:
                 self.set_DWSTATE(True)
                 self.set_CHANNELID(ctx.channel.id)
                 response = "Daily Waifu feature is now on."
-                print(f'DWSTATE state is {db["DWSTATE"]}')
+
+                # log print db values
+                self.db_to_log()
 
         elif commandArg == "off":
             if not self.get_DWSTATE():
@@ -118,6 +120,10 @@ class waifu:
             response = self.__GenWaifu(arg.strip())
             response = f"This is {arg}, a {response}"
         return response
+
+    def db_to_log(self):
+        for key in db:
+            print(f"{key} is set to {db[key]}")
             
     #######################
     # OLD & TESTING BELOW #
