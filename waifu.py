@@ -27,19 +27,19 @@ class Waifu:
         self.__CTX = ctx
 
     def get_CHANNELID(self):
-        if db["CHANNELID"] is None:
+        if db["DAILYWAIFU-CHANNELID"] is None:
             return None
         else:
-            return int(db["CHANNELID"])
+            return int(db["DAILYWAIFU-CHANNELID"])
 
     def set_CHANNELID(self, ID):
-        db["CHANNELID"] = ID
+        db["DAILYWAIFU-CHANNELID"] = ID
 
-    def get_DWSTATE(self):
-        return db["DWSTATE"]
+    def get_DAILY_STATE(self):
+        return db["DAILYWAIFU-STATE"]
 
-    def set_DWSTATE(self, boolean):
-        db["DWSTATE"] = boolean
+    def set_DAILY_STATE(self, boolean):
+        db["DAILYWAIFU-STATE"] = boolean
 
     def get_tasktime(self):
         return self.__tasktime
@@ -48,10 +48,10 @@ class Waifu:
         self.__tasktime = time
 
     def get_RUNTODAY(self):
-        return db["RUNTODAY"]
+        return db["DAILYWAIFU-RUNTODAY"]
 
     def set_RUNTODAY(self, boolean):
-        db["RUNTODAY"] = boolean
+        db["DAILYWAIFU-RUNTODAY"] = boolean
 
     def get_TZARIZONA(self):
         return self.__TZARIZONA
@@ -65,65 +65,70 @@ class Waifu:
     #################
     # CLASS METHODS #
     #################
+    def __gen_waifu(self, seed):
+        random.seed(seed)
+        slider = random.randint(3, 20) * 0.1
+        slider = format(slider, '.1f')
+        waifu = str(random.randint(0, 99999)).zfill(5)
+        response = ("cute and totally not super cursed waifu!\n"
+                    f"https://thisanimedoesnotexist.ai/results/psi-{str(slider)}/seed{str(waifu)}.png")
+        return response
+
+    def __db_to_log(self):
+        for key in db:
+            print(f"{key} is set to {db[key]}")
+
     def arg_resolve(self, ctx, commandArg):
         response = ""
         # Argument resolution
         if commandArg == "on":
-            if self.get_DWSTATE():
+            if self.get_DAILY_STATE():
                 response = f"Daily Waifu feature is already on...\nTry using '{self.__PREFIX}dailywaifu check' first next time."
             # turn on feature
             else:
-                self.set_DWSTATE(True)
+                self.set_DAILY_STATE(True)
                 self.set_CHANNELID(ctx.channel.id)
                 response = "Daily Waifu feature is now on."
 
                 # log print db values
-                self.db_to_log()
+                self.__db_to_log()
 
         elif commandArg == "off":
-            if not self.get_DWSTATE():
+            if not self.get_DAILY_STATE():
                 response = f"Daily Waifu feature is already off...\nTry using '{self.__PREFIX}dailywaifu check' first next time."
             # turn off feature
             else:
-                self.set_DWSTATE(False)
+                self.set_DAILY_STATE(False)
                 self.set_CHANNELID(None)
                 self.set_TODAY(None)
                 response = "Daily Waifu feature is now off."
-                print(f'DWSTATE state is {db["DWSTATE"]}')
+
+                # log print db values
+                self.__db_to_log()
 
         elif commandArg == "check":
             # Message the state of the daily waifu feature
-            if self.get_DWSTATE():
+            if self.get_DAILY_STATE():
                 response = "The Daily Waifu feature is currently on."
             else:
                 response = "The Daily Waifu feature is currently off."
 
         else:
             # Display usable arguments
-            response = f"Please use '{self.__PREFIX}dailywaifu ' followed by:\n'on' - To turn on the daily waifu feature.\n'off' - to turn off the daily waifu feature.\n'check' - to check whether the dailywaifu feature is on or off."
+            response = (f"Please use '{self.__PREFIX}dailywaifu ' followed by:\n"
+                        "'on' - To turn on the daily waifu feature.\n"
+                        "'off' - to turn off the daily waifu feature.\n"
+                        "'check' - to check whether the dailywaifu feature is on or off.")
         return response
 
-    def __GenWaifu(self, seed):
-        random.seed(seed)
-        slider = random.randint(3, 20) * 0.1
-        slider = format(slider, '.1f')
-        waifu = str(random.randint(0, 99999)).zfill(5)
-        response = "cute and totally not super cursed waifu! \nhttps://thisanimedoesnotexist.ai/results/psi-" + str(slider) + "/seed" + str(waifu) + ".png"
-        return response
-
-    def send_waifu(self, author, arg=None):
-        author
+    def return_response(self, author, arg=None):
         if arg is None:
-            response = self.__GenWaifu(author)
+            response = self.__gen_waifu(author)
             response = f"{author}, I found your {response}"
         else:
-            response = self.__GenWaifu(arg.strip())
+            response = self.__gen_waifu(arg.strip())
             response = f"This is {arg}, a {response}"
         return response
-
-    def db_to_log(self):
-        for key in db:
-            print(f"{key} is set to {db[key]}")
             
     #######################
     # OLD & TESTING BELOW #

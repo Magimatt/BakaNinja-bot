@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 import random
 from waifu import Waifu
+from fursona import Fursona
 import asyncio
 from datetime import datetime#, date, timedelta
 
@@ -17,47 +18,103 @@ TOKEN = os.getenv('TOKEN')
 PREFIX = "~"
 bot = commands.Bot(command_prefix=PREFIX, description='A bot to do stupid and cringy weeb things.\nWritten by Magimatt.')
 w = Waifu(PREFIX)
+f = Fursona(PREFIX)
 
 
 #############
 # Bot logic #
 #############
-def GenFursona(seed):
-    salt = "391110"
-    # print(seed + salt)
-    random.seed(seed + salt)
-    fursona = str(random.randint(0, 99999)).zfill(5)
-    response = "sexy and totally not super monsterous eldritch nightmare beast fursona! \nhttps://thisfursonadoesnotexist.com/v2/jpgs-2x/seed" + str(fursona) + ".jpg"
-    return response
-
-async def daily_waifu_loop():
+async def daily_loop(feature):
     while True:
         # fail open check
         # check date and set if not today (plus activate daily waifu)
-        if (not w.get_DWSTATE() or
-        w.get_CHANNELID is None or
-        datetime.now(w.get_TZARIZONA()).strftime("%m/%d/%Y") == w.get_TODAY()):
+        if (not feature.get_DAILY_STATE() or
+        feature.get_CHANNELID is None or
+        datetime.now(feature.get_TZARIZONA()).strftime("%m/%d/%Y") == feature.get_TODAY()):
             await asyncio.sleep(10)
         else:
             await bot.wait_until_ready()
-            waifudatename = datetime.now(w.get_TZARIZONA()).strftime("%m/%d/%Y")
+            waifudatename = datetime.now(feature.get_TZARIZONA()).strftime("%m/%d/%Y")
             print(f"waifudatename is {waifudatename}")
-            ID = w.get_CHANNELID()
+            ID = feature.get_CHANNELID()
             print(f"{ID}, is type {type(ID)}")
             channel = bot.get_channel(ID)
             print(f"Channel {channel} get!")
 
             async with channel.typing(): # this does ctx.trigger_typing() without the ctx parameter
                 await asyncio.sleep(3)
-                await channel.send(w.send_waifu("No author", waifudatename))
+                await channel.send(feature.return_response("No author", waifudatename))
             print(f"Daily waifu {waifudatename} sent.")
 
-            w.set_TODAY(waifudatename)
-            print(f"Today has been set to {w.get_TODAY()}.")
+            feature.set_TODAY(waifudatename)
+            print(f"Today has been set to {feature.get_TODAY()}.")
 
-async def bot_is_typing(ctx, seconds=3):
+# possibly obsolete
+# async def daily_waifu_loop():
+#     while True:
+#         # fail open check
+#         # check date and set if not today (plus activate daily waifu)
+#         if (not w.get_DAILY_STATE() or
+#         w.get_CHANNELID is None or
+#         datetime.now(w.get_TZARIZONA()).strftime("%m/%d/%Y") == w.get_TODAY()):
+#             await asyncio.sleep(10)
+#         else:
+#             await bot.wait_until_ready()
+#             waifudatename = datetime.now(w.get_TZARIZONA()).strftime("%m/%d/%Y")
+#             print(f"waifudatename is {waifudatename}")
+#             ID = w.get_CHANNELID()
+#             print(f"{ID}, is type {type(ID)}")
+#             channel = bot.get_channel(ID)
+#             print(f"Channel {channel} get!")
+
+#             async with channel.typing(): # this does ctx.trigger_typing() without the ctx parameter
+#                 await asyncio.sleep(3)
+#                 await channel.send(w.return_response("No author", waifudatename))
+#             print(f"Daily waifu {waifudatename} sent.")
+
+#             w.set_TODAY(waifudatename)
+#             print(f"Today has been set to {w.get_TODAY()}.")
+
+# async def daily_fursona_loop():
+#     while True:
+#         # fail open check
+#         # check date and set if not today (plus activate daily fursona)
+#         if (not f.get_DAILY_STATE() or
+#         f.get_CHANNELID is None or
+#         datetime.now(f.get_TZARIZONA()).strftime("%m/%d/%Y") == f.get_TODAY()):
+#             await asyncio.sleep(10)
+#         else:
+#             await bot.wait_until_ready()
+#             fursonadatename = datetime.now(f.get_TZARIZONA()).strftime("%m/%d/%Y")
+#             print(f"fursonadatename is {fursonadatename}")
+#             ID = f.get_CHANNELID()
+#             print(f"{ID}, is type {type(ID)}")
+#             channel = bot.get_channel(ID)
+#             print(f"Channel {channel} get!")
+
+#             async with channel.typing(): # this does ctx.trigger_typing() without the ctx parameter
+#                 await asyncio.sleep(3)
+#                 await channel.send(f.return_response("No author", fursonadatename))
+#             print(f"Daily fursona {fursonadatename} sent.")
+
+#             w.set_TODAY(fursonadatename)
+#             print(f"Today has been set to {f.get_TODAY()}.")
+
+async def bot_is_typing(ctx, seconds=2):
     await ctx.trigger_typing()
     await asyncio.sleep(seconds)
+
+def must_bang(mentionID): # for cow mom (aka Jacob)
+    if mentionID[2] == "!":
+        print(mentionID)
+        return mentionID
+    else:
+        print(f"before split/join: {mentionID}")
+        splitMentionID = list(mentionID)
+        splitMentionID.insert(2, "!")
+        joinMentionID = ''.join(splitMentionID)
+        print(f"after split/join: {joinMentionID}")
+        return joinMentionID
 
 
 ################
@@ -81,37 +138,38 @@ async def hello(ctx):
 @bot.command()
 async def waifu(ctx, *, arg=None):
     await bot_is_typing(ctx, 2)
-    author = ctx.author.mention
-    await ctx.send(w.send_waifu(author, arg))
+    author = must_bang(ctx.author.mention)
+    await ctx.send(w.return_response(author, arg))
 
 # ~fursona command
 @bot.command()
 async def fursona(ctx, *, arg=None):
     await bot_is_typing(ctx, 2)
-    # author = ctx.author.mention
-    author = ctx.author.mention
-    print(f"Author: {author}")
-    print(f"argument: {arg}")
-    if arg is None:
-        response = GenFursona(author)
-        response = f"{author}, I found your {response}"
-    else:
-        response = GenFursona(arg.strip())
-        response = f"This is {arg}, a {response}"
-    await ctx.send(response)
+    author = must_bang(ctx.author.mention)
+    await ctx.send(f.return_response(author, arg))
 
 # ~dailywaifu command, starts a daily waifu message sent in the channel it originated from
 @bot.command()
 async def dailywaifu(ctx, arg=None):
     await bot_is_typing(ctx, 2)
-    response = w.arg_resolve(ctx, arg)
+    response = w.arg_resolve(ctx, arg) # sends a confirmation message as well as activates/deactivates the feature
+    await ctx.send(response)
+
+# ~dailyfursona command, starts a daily fursona message sent in the channel it originated from
+@bot.command()
+async def dailyfursona(ctx, arg=None):
+    await bot_is_typing(ctx, 2)
+    response = f.arg_resolve(ctx, arg) # sends a confirmation message as well as activates/deactivates the feature
     await ctx.send(response)
 
 #################
 # START THE BOT #
 #################
 def initialize_bot():
-    bot.loop.create_task(daily_waifu_loop()) # adds the infinite asychio loop to the bot.run()
+    # add infinite asyncio loops to the bot.run()
+    bot.loop.create_task(daily_loop(w))
+    bot.loop.create_task(daily_loop(f))
+
     print("Starting bot...")
     bot.run(TOKEN)
 
