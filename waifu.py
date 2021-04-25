@@ -1,66 +1,18 @@
-from datetime import time
-import pytz
-from replit import db
 import random
 
+from feature import Feature
 
-class Waifu:
+class Waifu(Feature):
     ###############
     # CONSTRUCTOR #
     ###############
     def __init__(self, prefix, ctx=None):
+        super().__init__(db_key="WAIFU")
         self.__PREFIX = prefix
-        self.__TZARIZONA = pytz.timezone('US/ARIZONA')
         self.__CTX = ctx
 
-        # time() obj = midnight + one second
-        self.__tasktime = time().replace(hour=0, minute=0, second=1, microsecond=0, tzinfo=self.__TZARIZONA) # TODO: implement time argument
         # self.__DWSTATE = db["DWSTATE"]
 
-    #####################
-    # GETTERS & SETTERS #
-    #####################
-    def get_CTX(self):
-        return self.__CTX
-
-    def set_CTX(self, ctx):
-        self.__CTX = ctx
-
-    def get_CHANNELID(self):
-        if db["DAILYWAIFU-CHANNELID"] is None:
-            return None
-        else:
-            return int(db["DAILYWAIFU-CHANNELID"])
-
-    def set_CHANNELID(self, ID):
-        db["DAILYWAIFU-CHANNELID"] = ID
-
-    def get_DAILY_STATE(self):
-        return db["DAILYWAIFU-STATE"]
-
-    def set_DAILY_STATE(self, boolean):
-        db["DAILYWAIFU-STATE"] = boolean
-
-    def get_tasktime(self):
-        return self.__tasktime
-
-    def set_tasktime(self, time):
-        self.__tasktime = time
-
-    def get_RUNTODAY(self):
-        return db["DAILYWAIFU-RUNTODAY"]
-
-    def set_RUNTODAY(self, boolean):
-        db["DAILYWAIFU-RUNTODAY"] = boolean
-
-    def get_TZARIZONA(self):
-        return self.__TZARIZONA
-
-    def get_TODAY(self):
-        return db["TODAY"]
-
-    def set_TODAY(self, date):
-        db["TODAY"] = str(date)
 
     #################
     # CLASS METHODS #
@@ -73,10 +25,6 @@ class Waifu:
         response = ("cute and totally not super cursed waifu!\n"
                     f"https://thisanimedoesnotexist.ai/results/psi-{str(slider)}/seed{str(waifu)}.png")
         return response
-
-    def __db_to_log(self):
-        for key in db:
-            print(f"{key} is set to {db[key]}")
 
     def arg_resolve(self, ctx, commandArg):
         response = ""
