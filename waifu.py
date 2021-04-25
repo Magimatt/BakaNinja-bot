@@ -74,6 +74,10 @@ class Waifu:
         waifu = str(random.randint(0, 99999)).zfill(5)
         response = ("https://thisanimedoesnotexist.ai/results"
                     f"/psi-{str(slider)}/seed{str(waifu)}.png")
+                    
+        # Reset seed for next next random operation
+        random.seed()
+
         return response
 
     def __db_to_log(self):
@@ -128,8 +132,6 @@ class Waifu:
         url = self.__gen_waifu(seed)
         response_set = responses.waifu_seeded if arg is not None else responses.waifu_base
         
-        # Reset seed for next next random operation
-        random.seed()
         response = random.choice(response_set)
         response = response.format(name=seed, url=url)
 

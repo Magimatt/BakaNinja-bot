@@ -74,6 +74,9 @@ class Fursona:
         response = ("https://thisfursonadoesnotexist.com/v2/jpgs-2x"
                     f"/seed{str(fursona)}.jpg")
         
+        # Reset seed for next next random operation
+        random.seed()
+        
         return response
 
     def __db_to_log(self):
@@ -131,8 +134,6 @@ class Fursona:
         url = self.__gen_fursona(seed)
         response_set = responses.fursona_seeded if arg is not None else responses.fursona_base
 
-        # Reset seed for next next random operation
-        random.seed()
         response = random.choice(response_set)
         response = response.format(name=seed, url=url)
         
