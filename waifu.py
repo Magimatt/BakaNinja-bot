@@ -3,6 +3,8 @@ import pytz
 from replit import db
 import random
 
+import responses
+
 
 class Waifu:
     ###############
@@ -70,8 +72,8 @@ class Waifu:
         slider = random.randint(3, 20) * 0.1
         slider = format(slider, '.1f')
         waifu = str(random.randint(0, 99999)).zfill(5)
-        response = ("cute and totally not super cursed waifu!\n"
-                    f"https://thisanimedoesnotexist.ai/results/psi-{str(slider)}/seed{str(waifu)}.png")
+        response = ("https://thisanimedoesnotexist.ai/results"
+                    f"/psi-{str(slider)}/seed{str(waifu)}.png")
         return response
 
     def __db_to_log(self):
@@ -122,14 +124,17 @@ class Waifu:
         return response
 
     def return_response(self, author, arg=None):
-        if arg is None:
-            response = self.__gen_waifu(author)
-            response = f"{author}, I found your {response}"
-        else:
-            response = self.__gen_waifu(arg.strip())
-            response = f"This is {arg}, a {response}"
+        seed = arg.strip() if arg is not None else author
+        url = self.__gen_waifu(seed)
+        response_set = responses.waifu_seeded if arg is not None else responses.waifu_base
+        
+        # Reset seed for next next random operation
+        random.seed()
+        response = random.choice(response_set)
+        response = response.format(name=seed, url=url)
+
         return response
-            
+    
     #######################
     # OLD & TESTING BELOW #
     #######################
