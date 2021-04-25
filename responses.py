@@ -16,5 +16,5 @@ fursona_base = [
 
 fursona_seeded = [
     'This is {name}, a sexy and totally not super monsterous eldritch nightmare beast fursona!\n{url}',
-    'hewe\'s youw cute widdle fursona uwu. it\'s name is {name}\n{url}'
+    'hewe\'s a cute widdle fursona uwu. it\'s name is {name}\n{url}'
 ]
