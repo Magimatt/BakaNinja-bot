@@ -74,7 +74,7 @@ class Fursona:
         response = ("https://thisfursonadoesnotexist.com/v2/jpgs-2x"
                     f"/seed{str(fursona)}.jpg")
         
-        # Reset seed for next next random operation
+        # Reset seed for next random operation
         random.seed()
         
         return response
