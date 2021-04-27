@@ -28,13 +28,14 @@ async def daily_loop(feature):
     while True:
         # fail open check
         # check date and set if not today (plus activate daily waifu)
-        if (not feature.get_DAILY_STATE() or
-        feature.get_CHANNELID is None or
-        datetime.now(feature.get_TZARIZONA()).strftime("%m/%d/%Y") == feature.get_TODAY()):
+        if (not feature.get_DAILY_STATE()
+                or feature.get_CHANNELID is None
+                or feature.get_current_date_string() == feature.get_TODAY()):
+            
             await asyncio.sleep(10)
         else:
             await bot.wait_until_ready()
-            waifudatename = datetime.now(feature.get_TZARIZONA()).strftime("%m/%d/%Y")
+            waifudatename = feature.get_current_date_string()
             print(f"waifudatename is {waifudatename}")
             ID = feature.get_CHANNELID()
             print(f"{ID}, is type {type(ID)}")
