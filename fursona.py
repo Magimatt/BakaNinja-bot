@@ -3,6 +3,8 @@ import pytz
 from replit import db
 import random
 
+import responses
+
 
 class Fursona:
     ###############
@@ -69,8 +71,11 @@ class Fursona:
         # print(seed + salt)    # for testing
         random.seed(seed + salt)
         fursona = str(random.randint(0, 99999)).zfill(5)
-        response = ("sexy and totally not super monsterous eldritch nightmare beast fursona!\n"
-                    f"https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed{str(fursona)}.jpg")
+        response = ("https://thisfursonadoesnotexist.com/v2/jpgs-2x"
+                    f"/seed{str(fursona)}.jpg")
+        
+        # Reset seed for next random operation
+        random.seed()
         
         return response
 
@@ -125,11 +130,11 @@ class Fursona:
         return response
 
     def return_response(self, author, arg=None):
-        if arg is None:
-            response = self.__gen_fursona(author)
-            response = f"{author}, I found your {response}"
-        else:
-            response = self.__gen_fursona(arg.strip())
-            response = f"This is {arg}, a {response}"
+        seed = arg.strip() if arg is not None else author
+        url = self.__gen_fursona(seed)
+        response_set = responses.fursona_seeded if arg is not None else responses.fursona_base
+
+        response = random.choice(response_set)
+        response = response.format(name=seed, url=url)
         
         return response

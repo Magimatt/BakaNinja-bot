@@ -109,11 +109,9 @@ def must_bang(mentionID): # for cow mom (aka Jacob)
         print(mentionID)
         return mentionID
     else:
-        print(f"before split/join: {mentionID}")
         splitMentionID = list(mentionID)
         splitMentionID.insert(2, "!")
         joinMentionID = ''.join(splitMentionID)
-        print(f"after split/join: {joinMentionID}")
         return joinMentionID
 
 
