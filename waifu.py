@@ -1,66 +1,20 @@
-from datetime import time
-import pytz
-from replit import db
 import random
 
+from feature import Feature
+import responses
 
-class Waifu:
+
+class Waifu(Feature):
     ###############
     # CONSTRUCTOR #
     ###############
     def __init__(self, prefix, ctx=None):
+        super().__init__(db_key="WAIFU")
         self.__PREFIX = prefix
-        self.__TZARIZONA = pytz.timezone('US/ARIZONA')
         self.__CTX = ctx
 
-        # time() obj = midnight + one second
-        self.__tasktime = time().replace(hour=0, minute=0, second=1, microsecond=0, tzinfo=self.__TZARIZONA) # TODO: implement time argument
         # self.__DWSTATE = db["DWSTATE"]
 
-    #####################
-    # GETTERS & SETTERS #
-    #####################
-    def get_CTX(self):
-        return self.__CTX
-
-    def set_CTX(self, ctx):
-        self.__CTX = ctx
-
-    def get_CHANNELID(self):
-        if db["DAILYWAIFU-CHANNELID"] is None:
-            return None
-        else:
-            return int(db["DAILYWAIFU-CHANNELID"])
-
-    def set_CHANNELID(self, ID):
-        db["DAILYWAIFU-CHANNELID"] = ID
-
-    def get_DAILY_STATE(self):
-        return db["DAILYWAIFU-STATE"]
-
-    def set_DAILY_STATE(self, boolean):
-        db["DAILYWAIFU-STATE"] = boolean
-
-    def get_tasktime(self):
-        return self.__tasktime
-
-    def set_tasktime(self, time):
-        self.__tasktime = time
-
-    def get_RUNTODAY(self):
-        return db["DAILYWAIFU-RUNTODAY"]
-
-    def set_RUNTODAY(self, boolean):
-        db["DAILYWAIFU-RUNTODAY"] = boolean
-
-    def get_TZARIZONA(self):
-        return self.__TZARIZONA
-
-    def get_TODAY(self):
-        return db["TODAY"]
-
-    def set_TODAY(self, date):
-        db["TODAY"] = str(date)
 
     #################
     # CLASS METHODS #
@@ -70,13 +24,13 @@ class Waifu:
         slider = random.randint(3, 20) * 0.1
         slider = format(slider, '.1f')
         waifu = str(random.randint(0, 99999)).zfill(5)
-        response = ("cute and totally not super cursed waifu!\n"
-                    f"https://thisanimedoesnotexist.ai/results/psi-{str(slider)}/seed{str(waifu)}.png")
-        return response
+        response = ("https://thisanimedoesnotexist.ai/results"
+                    f"/psi-{str(slider)}/seed{str(waifu)}.png")
+                    
+        # Reset seed for next next random operation
+        random.seed()
 
-    def __db_to_log(self):
-        for key in db:
-            print(f"{key} is set to {db[key]}")
+        return response
 
     def arg_resolve(self, ctx, commandArg):
         response = ""
@@ -122,14 +76,15 @@ class Waifu:
         return response
 
     def return_response(self, author, arg=None):
-        if arg is None:
-            response = self.__gen_waifu(author)
-            response = f"{author}, I found your {response}"
-        else:
-            response = self.__gen_waifu(arg.strip())
-            response = f"This is {arg}, a {response}"
+        seed = arg.strip() if arg is not None else author
+        url = self.__gen_waifu(seed)
+        response_set = responses.waifu_seeded if arg is not None else responses.waifu_base
+        
+        response = random.choice(response_set)
+        response = response.format(name=seed, url=url)
+
         return response
-            
+    
     #######################
     # OLD & TESTING BELOW #
     #######################
