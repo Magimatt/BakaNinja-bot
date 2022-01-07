@@ -3,23 +3,26 @@ import sys
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-import random
+import asyncio
 from waifu import Waifu
 from fursona import Fursona
-import asyncio
+from ask import Ask
 from datetime import datetime#, date, timedelta
+# import random     # unneeded now that the fursona and waifu methods have been moved into their own classes.
+
 
 #########################
 # Global bot properties #
 #########################
 load_dotenv()
-TOKEN = os.getenv('TOKEN')
-# TOKEN = os.environ['TOKEN']
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+WOLFRAM_ALPHA_TOKEN = os.getenv('WOLFRAM_ALPHA_TOKEN')
+# TOKEN = os.environ['TOKEN'] # per REPLIT this is the way to access the environment variables...
 PREFIX = "~"
 bot = commands.Bot(command_prefix=PREFIX, description='A bot to do stupid and cringy weeb things.\nWritten by Magimatt.')
 w = Waifu(PREFIX)
 f = Fursona(PREFIX)
-
+a = Ask(PREFIX)
 
 #############
 # Bot logic #
@@ -101,11 +104,10 @@ async def daily_loop(feature):
 #             w.set_TODAY(fursonadatename)
 #             print(f"Today has been set to {f.get_TODAY()}.")
 
-async def bot_is_typing(ctx, seconds=2):
-    await ctx.trigger_typing()
-    await asyncio.sleep(seconds)
-
 def must_bang(mentionID): # for cow mom (aka Jacob)
+    # Discord adds a '!' to member mention IDs (e.g. <@!126486951368>)
+    # if they have a nickname set in the guild. This produces an
+    # inconsistent seed if the member does not have a nickname set.
     if mentionID[2] == "!":
         print(mentionID)
         return mentionID
@@ -115,11 +117,38 @@ def must_bang(mentionID): # for cow mom (aka Jacob)
         joinMentionID = ''.join(splitMentionID)
         return joinMentionID
 
+async def bot_is_typing(ctx, responselength):
+    seconds = 2  # minimun trigger_typing amount
+    # Else calculate a percentage of the total message characters to 10 seconds
+    if responselength > 200:
+        seconds = (responselength / 2000) * 10
+    
+    # trigger_typing() goes for 10 seconds or until a context.send() is called
+    await ctx.trigger_typing()
+    await asyncio.sleep(seconds)
+
+async def bot_respond(ctx, response):
+    # Discord limits response size to 2000 characters or less
+    # splitresponse() will split up the response into 2000 char length chunks
+    def splitresponse(str, chunk=2000):
+        return [ str[start:start+chunk] for start in range(0, len(str), chunk) ]
+    
+    print(f"BakaNinja-bot is trying to type: {response}")  # Debug
+
+    if len(response) <= 2000 and len(response) != 0:
+        await bot_is_typing(ctx, len(response))
+        await ctx.send(response)
+    else:
+        responselist = splitresponse(response)
+        for chunk in responselist:
+            if len(chunk) != 0:
+                await bot_is_typing(ctx, len(chunk))
+                await ctx.send(chunk)
+
 
 ################
 # Bot Commands #
 ################
-
 @bot.event
 async def on_ready():
     print(f'Python version: {sys.version}')
@@ -130,36 +159,41 @@ async def on_ready():
 # bot test command
 @bot.command()
 async def hello(ctx):
-    await bot_is_typing(ctx, 2)
-    await ctx.send("Konnichiwa! I'm BakaNinja Bot!")
+    hello = "Konnichiwa! I'm BakaNinja Bot!"
+    await bot_respond(ctx, hello)
 
 # ~waifu command
-@bot.command()
+@bot.command(name='waifu', aliases=['w'])
 async def waifu(ctx, *, arg=None):
-    await bot_is_typing(ctx, 2)
     author = must_bang(ctx.author.mention)
-    await ctx.send(w.return_response(author, arg))
+    response = w.return_response(author, arg)
+    await bot_respond(ctx, response)
 
 # ~fursona command
-@bot.command()
+@bot.command(name='fursona', aliases=['f'])
 async def fursona(ctx, *, arg=None):
-    await bot_is_typing(ctx, 2)
     author = must_bang(ctx.author.mention)
-    await ctx.send(f.return_response(author, arg))
+    response = f.return_response(author, arg)
+    await bot_respond(ctx, response)
 
 # ~dailywaifu command, starts a daily waifu message sent in the channel it originated from
-@bot.command()
+@bot.command(name='dailywaifu', aliases=['dw'])
 async def dailywaifu(ctx, arg=None):
-    await bot_is_typing(ctx, 2)
     response = w.arg_resolve(ctx, arg) # sends a confirmation message as well as activates/deactivates the feature
-    await ctx.send(response)
+    await bot_respond(ctx, response)
 
 # ~dailyfursona command, starts a daily fursona message sent in the channel it originated from
-@bot.command()
+@bot.command(name='dailyfursona', aliases=['df'])
 async def dailyfursona(ctx, arg=None):
-    await bot_is_typing(ctx, 2)
     response = f.arg_resolve(ctx, arg) # sends a confirmation message as well as activates/deactivates the feature
-    await ctx.send(response)
+    await bot_respond(ctx, response)
+
+@bot.command(name='question', aliases=['ask', 'q', '?'])
+async def question(ctx, *, arg=None):
+    await bot_respond(ctx, "Hmmm... let me think.")
+    response = await a.return_response_ask(arg)
+
+    await bot_respond(ctx, response)
 
 #################
 # START THE BOT #
@@ -170,7 +204,7 @@ def initialize_bot():
     bot.loop.create_task(daily_loop(f))
 
     print("Starting bot...")
-    bot.run(TOKEN)
+    bot.run(DISCORD_TOKEN)
 
 if __name__ == "__main__":
     initialize_bot()
