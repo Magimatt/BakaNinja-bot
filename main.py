@@ -163,32 +163,47 @@ async def hello(ctx):
     await bot_respond(ctx, hello)
 
 # ~waifu command
-@bot.command(name='waifu', aliases=['w'])
+@bot.command(name='waifu',
+             aliases=['w'],
+             help='Generate a waifu with the ~waifu command alone or with any argument after (E.g. ~waifu weeb)',
+             brief='Use with or without a following argument.')
 async def waifu(ctx, *, arg=None):
     author = must_bang(ctx.author.mention)
     response = w.return_response(author, arg)
     await bot_respond(ctx, response)
 
 # ~fursona command
-@bot.command(name='fursona', aliases=['f'])
+@bot.command(name='fursona',
+             aliases=['f'],
+             help='Generate a fursona with the ~fursona command alone or with any argument after (E.g. ~fursona furry)',
+             brief='Use with or without a following argument.')
 async def fursona(ctx, *, arg=None):
     author = must_bang(ctx.author.mention)
     response = f.return_response(author, arg)
     await bot_respond(ctx, response)
 
 # ~dailywaifu command, starts a daily waifu message sent in the channel it originated from
-@bot.command(name='dailywaifu', aliases=['dw'])
+@bot.command(name='dailywaifu',
+             aliases=['dw'],
+             help='Bakaninja can provide you with endless waifu everyday! Use the argument "check" to see if the feature is on. "on" will turn it on and "off" wil turn it off. Amazing!',
+             brief='Use arguments "on" and "off". "check" will tell you the status')
 async def dailywaifu(ctx, arg=None):
     response = w.arg_resolve(ctx, arg) # sends a confirmation message as well as activates/deactivates the feature
     await bot_respond(ctx, response)
 
 # ~dailyfursona command, starts a daily fursona message sent in the channel it originated from
-@bot.command(name='dailyfursona', aliases=['df'])
+@bot.command(name='dailyfursona',
+             aliases=['df'],
+             help='Bakaninja can provide you with endless waifu everyday! Use the argument "check" to see if the feature is on. "on" will turn it on and "off" wil turn it off. Amazing!',
+             brief='Use arguments "on" and "off". "check" will tell you the status')
 async def dailyfursona(ctx, arg=None):
     response = f.arg_resolve(ctx, arg) # sends a confirmation message as well as activates/deactivates the feature
     await bot_respond(ctx, response)
 
-@bot.command(name='question', aliases=['ask', 'q', '?'])
+@bot.command(name='question',
+             aliases=['ask', 'q', '?'],
+             help='Bakaninja know soooo much! Try asking it a question like "~question How many molecules are in a mole?"',
+             brief='Type the command followed by your question. (E.g. ~question How hot is the sun?')
 async def question(ctx, *, arg=None):
     await bot_respond(ctx, "Hmmm... let me think.")
     response = await a.return_response_ask(arg)
