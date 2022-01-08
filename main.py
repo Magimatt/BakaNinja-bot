@@ -203,7 +203,7 @@ async def dailyfursona(ctx, arg=None):
 @bot.command(name='question',
              aliases=['ask', 'q', '?'],
              help='Bakaninja know soooo much! Try asking it a question like "~question How many molecules are in a mole?"',
-             brief='Type the command followed by your question. (E.g. ~question How hot is the sun?')
+             brief='Type the command followed by your question.')
 async def question(ctx, *, arg=None):
     await bot_respond(ctx, "Hmmm... let me think.")
     response = await a.return_response_ask(arg)
