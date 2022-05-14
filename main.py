@@ -109,7 +109,6 @@ def must_bang(mentionID): # for cow mom (aka Jacob)
     # if they have a nickname set in the guild. This produces an
     # inconsistent seed if the member does not have a nickname set.
     if mentionID[2] == "!":
-        print(mentionID)
         return mentionID
     else:
         splitMentionID = list(mentionID)
@@ -169,7 +168,8 @@ async def hello(ctx):
              brief='Use with or without a following argument.')
 async def waifu(ctx, *, arg=None):
     author = must_bang(ctx.author.mention)
-    response = w.return_response(author, arg)
+    modified_arg = must_bang(arg) if arg is not None else None
+    response = w.return_response(author, modified_arg)
     await bot_respond(ctx, response)
 
 # ~fursona command
@@ -179,7 +179,8 @@ async def waifu(ctx, *, arg=None):
              brief='Use with or without a following argument.')
 async def fursona(ctx, *, arg=None):
     author = must_bang(ctx.author.mention)
-    response = f.return_response(author, arg)
+    modified_arg = must_bang(arg) if arg is not None else None
+    response = w.return_response(author, modified_arg)
     await bot_respond(ctx, response)
 
 # ~dailywaifu command, starts a daily waifu message sent in the channel it originated from
