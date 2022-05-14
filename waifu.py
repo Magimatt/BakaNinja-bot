@@ -76,7 +76,9 @@ class Waifu(Feature):
         return response
 
     def return_response(self, author, arg=None):
+        # If an arg was provided then use that instead of author
         seed = arg.strip() if arg is not None else author
+        print("return_response() seed:", seed)
         url = self.__gen_waifu(seed)
         response_set = responses.waifu_seeded if arg is not None else responses.waifu_base
         
