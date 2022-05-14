@@ -180,7 +180,7 @@ async def waifu(ctx, *, arg=None):
 async def fursona(ctx, *, arg=None):
     author = must_bang(ctx.author.mention)
     modified_arg = must_bang(arg) if arg is not None else None
-    response = w.return_response(author, modified_arg)
+    response = f.return_response(author, modified_arg)
     await bot_respond(ctx, response)
 
 # ~dailywaifu command, starts a daily waifu message sent in the channel it originated from
