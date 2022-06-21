@@ -42,7 +42,7 @@ class Feature:
         pickle.dump(database, outfile)
         outfile.close()
     
-    def __db_to_log(self):
+    def db_to_log(self):
         db = self.__get_db()
         for key in db:
             print(f"{key} is set to {db[key]}")

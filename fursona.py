@@ -44,7 +44,7 @@ class Fursona(Feature):
                 response = "Daily Fursona feature is now on."
 
                 # log print db values
-                self.__db_to_log()
+                self.db_to_log()
 
         elif commandArg == "off":
             if not self.get_DAILY_STATE():
@@ -58,7 +58,7 @@ class Fursona(Feature):
                 response = "Daily Fursona feature is now off."
 
                 # log print db values
-                self.__db_to_log()
+                self.db_to_log()
 
         elif commandArg == "check":
             # Message the state of the daily Fursona feature

@@ -45,7 +45,7 @@ class Waifu(Feature):
                 response = "Daily Waifu feature is now on."
 
                 # log print db values
-                self.__db_to_log()
+                self.db_to_log()
 
         elif commandArg == "off":
             if not self.get_DAILY_STATE():
@@ -58,7 +58,7 @@ class Waifu(Feature):
                 response = "Daily Waifu feature is now off."
 
                 # log print db values
-                self.__db_to_log()
+                self.db_to_log()
 
         elif commandArg == "check":
             # Message the state of the daily waifu feature
