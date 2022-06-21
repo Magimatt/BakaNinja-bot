@@ -107,6 +107,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+baka-venv/
 env/
 venv/
 ENV/
@@ -139,3 +140,6 @@ cython_debug/
 
 # Development stub for testing purposes
 replit.py
+
+# Local db
+/daily
