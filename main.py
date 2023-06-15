@@ -167,10 +167,6 @@ async def hello(ctx):
              help='Generate a waifu with the ~waifu command alone or with any argument after (E.g. ~waifu weeb)',
              brief='Use with or without a following argument.')
 async def waifu(ctx, *, arg=None):
-    print(f"ID: {ctx.author.id}\n" +
-          f"Mention: {ctx.author.mention}\n" +
-          f"Nickname: {ctx.author.nick}\n" +
-          f"Name: {ctx.author.name}")
     author = must_bang(ctx.author.mention)
     modified_arg = must_bang(arg) if arg is not None else None
     response = w.return_response(author, modified_arg)
