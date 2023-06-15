@@ -139,3 +139,8 @@ cython_debug/
 
 # Development stub for testing purposes
 replit.py
+
+# Virtual environment stuff
+baka-venv
+activate.sh
+start_baka_bot.sh
