@@ -8,7 +8,7 @@ from waifu import Waifu
 from fursona import Fursona
 from ask import Ask
 from datetime import datetime#, date, timedelta
-# import random     # unneeded now that the fursona and waifu methods have been moved into their own classes.
+import re as regex
 
 
 #########################
@@ -104,17 +104,17 @@ async def daily_loop(feature):
 #             w.set_TODAY(fursonadatename)
 #             print(f"Today has been set to {f.get_TODAY()}.")
 
-def must_bang(mentionID): # for cow mom (aka Jacob)
-    # Discord adds a '!' to member mention IDs (e.g. <@!126486951368>)
+def must_bang(arg): # for cow mom (aka Jacob)
+    # Discord adds a '!' to member mention IDs (e.g. <@!123456789012>)
     # if they have a nickname set in the guild. This produces an
     # inconsistent seed if the member does not have a nickname set.
-    if mentionID[2] == "!":
-        return mentionID
+    if not regex.match(r'<@\d{17,18}>', arg):
+        return arg
     else:
-        splitMentionID = list(mentionID)
-        splitMentionID.insert(2, "!")
-        joinMentionID = ''.join(splitMentionID)
-        return joinMentionID
+        splitArg = list(arg)
+        splitArg.insert(2, "!")
+        joinArg = ''.join(splitArg)
+        return joinArg
 
 async def bot_is_typing(ctx, responselength):
     seconds = 2  # minimun trigger_typing amount
@@ -167,6 +167,10 @@ async def hello(ctx):
              help='Generate a waifu with the ~waifu command alone or with any argument after (E.g. ~waifu weeb)',
              brief='Use with or without a following argument.')
 async def waifu(ctx, *, arg=None):
+    print(f"ID: {ctx.author.id}\n" +
+          f"Mention: {ctx.author.mention}\n" +
+          f"Nickname: {ctx.author.nick}\n" +
+          f"Name: {ctx.author.name}")
     author = must_bang(ctx.author.mention)
     modified_arg = must_bang(arg) if arg is not None else None
     response = w.return_response(author, modified_arg)

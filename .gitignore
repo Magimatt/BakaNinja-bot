@@ -107,6 +107,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+baka-venv/
 env/
 venv/
 ENV/
@@ -144,3 +145,6 @@ replit.py
 baka-venv
 activate.sh
 start_baka_bot.sh
+
+# Local db
+/daily
