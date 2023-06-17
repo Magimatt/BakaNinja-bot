@@ -13,7 +13,7 @@ parser.add_argument('-r', '--reset', action='store_true',
                     help="Resets the daily database to default values.")
 parser.add_argument('-p', '--print', action='store_true',
                     help="Prints the daily database to console.")
-args = parser.parse_args(['-h'])
+args = parser.parse_args()
 
 if args.reset:
     outfile = open('daily','wb')
